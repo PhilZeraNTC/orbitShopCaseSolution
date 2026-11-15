@@ -15,3 +15,4 @@ reproduce: test
 
 all:
 	$(MAKE) setup && $(MAKE) reproduce
+
