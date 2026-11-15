@@ -36,7 +36,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Unit Testing Suite (TEST)
 
-- [ ] **TEST-01**: `tests/test_metrics.py` valida via `pytest` todos os invariantes de integridade da base, reconciliação financeira Q6 e métricas de Ground Truth (Q1 a Q8) com 100% de aprovação
+- [x] **TEST-01**: `tests/test_metrics.py` valida via `pytest` todos os invariantes de integridade da base, reconciliação financeira Q6 e métricas de Ground Truth (Q1 a Q8) com 100% de aprovação
 
 ### Static Visualizations (CHRT)
 
@@ -88,7 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | METR-04 | Phase 1 | Complete |
 | METR-05 | Phase 1 | Complete |
 | METR-06 | Phase 1 | Complete |
-| TEST-01 | Phase 1 | Pending |
+| TEST-01 | Phase 1 | Complete |
 | CHRT-01 | Phase 2 | Pending |
 | EXEC-01 | Phase 2 | Pending |
 | EXEC-02 | Phase 2 | Pending |
