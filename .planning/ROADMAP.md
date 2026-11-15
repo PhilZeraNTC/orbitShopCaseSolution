@@ -30,9 +30,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Setup do ambiente (`pyproject.toml`, `uv.lock`, `requirements.txt`, `Makefile`, `data/Base_Dados_OrbitShop.xlsx`) e módulo `src/loader.py`
-- [ ] 01-02: Implementação de `src/audit.py` (nulos, anomalias comerciais e reconciliação Q6) e `src/metrics.py` (paradoxo C-level e Q2–Q8)
-- [ ] 01-03: Suíte de testes unitários `tests/test_metrics.py` (`pytest`) validando todos os invariantes do PRD e verificação via `make test`
+**Wave 1**
+- [ ] 01-01-PLAN.md — Setup do ambiente (`pyproject.toml`, `uv.lock`, `requirements.txt`, `Makefile`, `data/Base_Dados_OrbitShop.xlsx`) e módulo `src/loader.py`
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 01-02-PLAN.md — Implementação de `src/audit.py` (nulos, anomalias comerciais e reconciliação Q6) e `src/metrics.py` (paradoxo C-level e Q2–Q8)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 01-03-PLAN.md — Suíte de testes unitários `tests/test_metrics.py` (`pytest`) validando todos os invariantes do PRD e verificação via `make test`
 
 ### Phase 2: Notebook & Gráficos
 **Goal**: Gerar as visualizações estáticas em alta resolução (`src/charts.py` -> `reports/figures/` em 300 DPI), o Jupyter Notebook executivo limpo e executado (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`), o Memo Executivo de 1 página (`reports/memo_orbitshop.md` e `reports/memo_orbitshop.pdf`, máx. 400 palavras) e o `README.md` executivo final validado via `make reproduce` e `make all`.
