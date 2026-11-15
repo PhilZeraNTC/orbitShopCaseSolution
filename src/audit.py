@@ -133,8 +133,8 @@ def reconcile_orders_vs_items(
     validos = rec.dropna(subset=["valor_total"])
     um_item_validos = validos[validos["qtd_itens"] == 1]
 
-    soma_pedidos = float(validos["valor_total"].sum())
-    soma_itens = float(validos["soma_liquida_itens"].sum())
+    soma_pedidos = float(rec["valor_total"].sum())
+    soma_itens = float(rec["soma_liquida_itens"].sum())
 
     summary: dict[str, int | float] = {
         "total_pedidos": int(len(rec)),
@@ -148,7 +148,7 @@ def reconcile_orders_vs_items(
         ),
         "soma_valor_total_pedidos": soma_pedidos,
         "soma_liquida_itens": soma_itens,
-        "soma_liquida_itens_todos_15000": float(rec["soma_liquida_itens"].sum()),
+        "soma_liquida_itens_validos": float(validos["soma_liquida_itens"].sum()),
         "diferenca_agregada": float(soma_pedidos - soma_itens),
         "correlacao_global": float(validos["valor_total"].corr(validos["soma_liquida_itens"])),
     }
@@ -192,8 +192,8 @@ def audit_q6_by_segment(
 
     media_b2b = float(b2b_row["media_valor_total_pedidos"])
     media_b2c = float(b2c_row["media_valor_total_pedidos"])
-    mediana_b2b = float(b2b_row["mediana_valor_total_pedidos"])
-    mediana_b2c = float(b2c_row["mediana_valor_total_pedidos"])
+    mediana_b2b = round(float(b2b_row["mediana_valor_total_pedidos"]) + 1e-9, 2)
+    mediana_b2c = round(float(b2c_row["mediana_valor_total_pedidos"]) + 1e-9, 2)
 
     # Impute nulls by segment median
     median_map = {"B2B": mediana_b2b, "B2C": mediana_b2c}
@@ -254,7 +254,11 @@ def build_orders_analytical_df(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     df_pedidos["is_cancelado"] = df_pedidos["status"] == "cancelado"
     df_pedidos["is_nao_convertido"] = df_pedidos["status"].isin(["cancelado", "devolvido"])
 
-    segment_medians = df_pedidos.groupby("segmento")["valor_total"].transform("median")
+    segment_medians = (
+        df_pedidos.groupby("segmento")["valor_total"]
+        .transform("median")
+        .apply(lambda v: round(float(v) + 1e-9, 2))
+    )
     df_pedidos["valor_total_imputado"] = df_pedidos["valor_total"].fillna(segment_medians)
 
     return df_pedidos
