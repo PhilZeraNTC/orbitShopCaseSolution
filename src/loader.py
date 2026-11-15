@@ -65,7 +65,7 @@ def load_orbitshop_data(path: Path | str | None = None) -> dict[str, pd.DataFram
 
 
 def audit_primary_keys(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """Audit row/column counts, exact duplicates, duplicate IDs, and null IDs across all 6 tables."""
+    """Audit row/column counts, duplicates, and null IDs across all 6 tables."""
     rows: list[dict[str, int | str]] = []
     for table_name in EXPECTED_ROW_COUNTS:
         df = data[table_name]
