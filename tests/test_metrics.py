@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
+
 import pandas as pd
 import pytest
+from PIL import Image
 
 from src.audit import (
     audit_commercial_rules,
@@ -278,3 +281,50 @@ def test_q8_recommendation_sizing(df_pedidos: pd.DataFrame) -> None:
     assert round(float(q8["pedidos_recuperados"])) == 747
     assert q8["ticket_medio_paid_search"] == pytest.approx(2553.51, abs=0.01)
     assert q8["receita_bruta_recuperavel"] / 1e6 == pytest.approx(1.91, abs=0.01)
+
+
+def test_phase2_deliverables_and_memo_constraints() -> None:
+    """Verify Phase 2 deliverables: 300 DPI PNG figures, <= 400-word Memo MD/PDF, and README."""
+    figures = [
+        "q2_status_pedidos.png",
+        "q6_reconciliacao_b2b_b2c.png",
+        "q4_cancelamento_canais.png",
+        "q5_serie_mensal_2023_2024.png",
+        "q7_fornecedores_qualidade_tickets.png",
+    ]
+    figures_dir = PROJECT_ROOT / "reports" / "figures"
+    for fname in figures:
+        fpath = figures_dir / fname
+        assert fpath.exists(), f"Missing figure: {fpath}"
+        assert fpath.stat().st_size > 30000
+        dpi = Image.open(fpath).info.get("dpi", (0, 0))[0]
+        assert round(dpi) == 300
+
+    memo_md = PROJECT_ROOT / "reports" / "memo_orbitshop.md"
+    assert memo_md.exists()
+    memo_text = memo_md.read_text(encoding="utf-8")
+    word_count = len(memo_text.split())
+    assert 200 <= word_count <= 400, f"Memo word count {word_count} exceeds 400-word limit"
+
+    memo_pdf = PROJECT_ROOT / "reports" / "memo_orbitshop.pdf"
+    assert memo_pdf.exists()
+    assert memo_pdf.stat().st_size > 5000
+    assert memo_pdf.read_bytes()[:4] == b"%PDF"
+
+    for nb_name in ("02_analise_executiva.ipynb", "analise_orbitshop.ipynb"):
+        nb_path = PROJECT_ROOT / "notebooks" / nb_name
+        assert nb_path.exists()
+        nb_data = json.loads(nb_path.read_text(encoding="utf-8"))
+        code_cells = [c for c in nb_data["cells"] if c["cell_type"] == "code"]
+        assert len(code_cells) >= 8
+        assert all(
+            c.get("execution_count") is not None and len(c.get("outputs", [])) > 0
+            for c in code_cells
+        )
+
+    readme_path = PROJECT_ROOT / "README.md"
+    assert readme_path.exists()
+    readme_text = readme_path.read_text(encoding="utf-8")
+    for fname in figures:
+        assert f"reports/figures/{fname}" in readme_text
+
