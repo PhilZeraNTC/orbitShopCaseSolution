@@ -69,7 +69,7 @@ def plot_q2_status(
     label_map = {
         "entregue": "Entregue",
         "cancelado": "Cancelado",
-        "em_transito": "Em Trânsito\n(788 de 2023)",
+        "em_transito": f"Em Trânsito\n({int(summary['em_transito_2023'])} de 2023)",
         "devolvido": "Devolvido",
     }
     color_map = {
@@ -266,15 +266,17 @@ def plot_q4_channels(
     colors = [
         RED if c == "paid_search" else NAVY for c in q4_df["canal_aquisicao"]
     ]
+    others = q4_df[q4_df["canal_aquisicao"] != "paid_search"]
+    benchmark_others = float(others["cancelados"].sum() / others["pedidos"].sum() * 100.0)
     bars1 = ax1.bar(
         q4_df["canal_aquisicao"], q4_df["taxa_cancel_pct"], color=colors, width=0.55
     )
     ax1.axhline(
-        11.94,
+        benchmark_others,
         color=TEAL,
         linestyle="--",
         linewidth=1.8,
-        label="Benchmark Demais Canais (11,9%)",
+        label=f"Benchmark Demais Canais ({benchmark_others:.1f}%)".replace(".", ","),
     )
     ax1.set_title(
         f"A. Taxa de Cancelamento por Canal (Chi² = {summary['chi2']:.2f}, p < 10⁻¹⁵⁸)\n"
@@ -349,6 +351,9 @@ def plot_q5_monthly(
     ]
     ax1.bar(q5_df["ano_mes"], q5_df["total_pedidos"], color=bar_colors, width=0.7)
     media_ex = float(summary["media_pedidos_ex_nov2023"])
+    ped_nov23 = int(summary["pedidos_nov_2023"])
+    ped_nov24 = int(summary["pedidos_nov_2024"])
+    mult_nov23 = float(summary["multiplo_pico_vs_media"])
     ax1.axhline(
         media_ex,
         color=TEAL,
@@ -357,8 +362,8 @@ def plot_q5_monthly(
         label=f"Média ex-Nov/23: {media_ex:.0f} ped./mês",
     )
     ax1.set_title(
-        "A. Série Histórica Mensal: Pico em 2023-11 (2.317 ped. = 4,2x a média) "
-        "vs. 2024-11 (585 ped.)"
+        f"A. Série Histórica Mensal: Pico em 2023-11 ({ped_nov23:,} ped. = "
+        f"{mult_nov23:.1f}x a média) vs. 2024-11 ({ped_nov24} ped.)".replace(",", ".")
     )
     ax1.set_ylabel("Total de Pedidos / Mês")
     ax1.set_ylim(0, 2650)
@@ -368,8 +373,8 @@ def plot_q5_monthly(
     nov23_idx = int(q5_df.index[q5_df["ano_mes"] == "2023-11"][0])
     nov24_idx = int(q5_df.index[q5_df["ano_mes"] == "2024-11"][0])
     ax1.annotate(
-        "2023-11: 2.317 ped.\n(4,2x a média)",
-        xy=(nov23_idx, 2317),
+        f"2023-11: {ped_nov23:,} ped.\n({mult_nov23:.1f}x a média)".replace(",", "."),
+        xy=(nov23_idx, ped_nov23),
         xytext=(nov23_idx - 4.5, 2400),
         arrowprops={"arrowstyle": "->", "color": RED, "lw": 1.5},
         fontsize=9.5,
@@ -377,8 +382,8 @@ def plot_q5_monthly(
         color=RED,
     )
     ax1.annotate(
-        "2024-11: 585 ped.\n(Sem repetição)",
-        xy=(nov24_idx, 585),
+        f"2024-11: {ped_nov24} ped.\n(Sem repetição)",
+        xy=(nov24_idx, ped_nov24),
         xytext=(nov24_idx - 4.5, 1150),
         arrowprops={"arrowstyle": "->", "color": "#B33939", "lw": 1.5},
         fontsize=9,
@@ -394,12 +399,15 @@ def plot_q5_monthly(
         int(summary["ped_mkt_nov_2023"]),
     ]
     bars2 = ax2.bar(canais_venda, valores_nov23, color=[NAVY, SLATE, TEAL], width=0.55)
-    ax2.set_title("B. Simetria de Canais em Nov/2023\n(2.317 Pedidos distribuídos ~1/3 cada)")
+    ax2.set_title(
+        f"B. Simetria de Canais em Nov/2023\n"
+        f"({ped_nov23:,} Pedidos distribuídos ~1/3 cada)".replace(",", ".")
+    )
     ax2.set_ylabel("Pedidos em 2023-11")
     ax2.set_ylim(0, 950)
     for bar in bars2:
         h = bar.get_height()
-        pct = h / 2317 * 100
+        pct = h / ped_nov23 * 100
         ax2.text(
             bar.get_x() + bar.get_width() / 2,
             h + 20,
