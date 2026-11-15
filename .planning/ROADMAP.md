@@ -49,11 +49,11 @@ Plans:
   2. O comando `make reproduce` executa os testes e roda o notebook executivo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`) via `nbconvert --to notebook --execute --inplace` sem erros, salvando tabelas formatadas e gráficos inline.
   3. O Memo Executivo de 1 página existe em `reports/memo_orbitshop.md` e `reports/memo_orbitshop.pdf` respeitando o limite estrito de no máximo 400 palavras.
   4. `README.md` apresenta guia de execução em 1 comando, resumo executivo, tabela de rastreabilidade Q1–Q9 e gráficos embutidos, com `make all` concluindo ponta a ponta com sucesso.
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 
 Plans:
 **Wave 1**
-- [ ] 02-01-PLAN.md — Módulo `src/charts.py` (PNGs 300 DPI em `reports/figures/`) e construção/execução do notebook executivo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`)
+- [x] 02-01-PLAN.md — Módulo `src/charts.py` (PNGs 300 DPI em `reports/figures/`) e construção/execução do notebook executivo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-02-PLAN.md — Redação e exportação do Memo Executivo de 1 página (`reports/memo_orbitshop.md` e `.pdf` <= 400 palavras), `README.md` executivo e validação `make all`
@@ -66,4 +66,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core & Testes | 3/3 | Complete    | 2026-11-15 |
-| 2. Notebook & Gráficos | 0/2 | Not started | - |
+| 2. Notebook & Gráficos | 1/2 | In Progress | - |
