@@ -12,7 +12,7 @@ Este roadmap estrutura a construção do repositório auditável de Due Diligenc
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Core & Testes** - Fundação do ambiente (`uv`/`Makefile`), módulos `src/loader.py`, `src/audit.py`, `src/metrics.py` e suíte `pytest` validando o Ground Truth (Q1–Q8)
+- [x] **Phase 1: Core & Testes** - Fundação do ambiente (`uv`/`Makefile`), módulos `src/loader.py`, `src/audit.py`, `src/metrics.py` e suíte `pytest` validando o Ground Truth (Q1–Q8) (completed 2026-11-15)
 - [ ] **Phase 2: Notebook & Gráficos** - Gráficos estáticos 300 DPI (`src/charts.py`), notebook executivo executado, Memo Executivo de 1 página (MD/PDF <= 400 palavras) e `README.md`
 
 ## Phase Details
@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `src/loader.py` e `src/audit.py` carregam as 6 abas tipadas sem chaves duplicadas ou órfãs e reproduzem exatamente a auditoria de nulos, anomalias comerciais (21.243 descontos sem cupom, 2.574 itens abaixo do custo) e reconciliação financeira Q6 (`Pedidos.valor_total` R$ 38.418.252,65 vs `Itens_Pedido` R$ 165.878.066,67; ticket B2B = 6,15x B2C após imputação dos 79 nulos).
   3. `src/metrics.py` retorna de forma pura e determinística todos os indicadores validados para o paradoxo Camila vs. Rogério e para as questões Q2, Q3, Q4, Q5, Q7 e Q8.
   4. O comando `make test` executa `pytest` em `tests/test_metrics.py` e aprova 100% dos testes de invariantes numéricos e regras de negócio do Ground Truth.
-**Plans**: 3/3 plans executed
+**Plans**: 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -62,5 +62,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core & Testes | 3/3 | In Progress | - |
+| 1. Core & Testes | 3/3 | Complete    | 2026-11-15 |
 | 2. Notebook & Gráficos | 0/2 | Not started | - |
