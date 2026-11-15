@@ -52,8 +52,11 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Módulo `src/charts.py` (PNGs 300 DPI em `reports/figures/`) e construção/execução do notebook executivo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`)
-- [ ] 02-02: Redação e exportação do Memo Executivo de 1 página (`reports/memo_orbitshop.md` e `.pdf` <= 400 palavras), `README.md` executivo e validação `make all`
+**Wave 1**
+- [ ] 02-01-PLAN.md — Módulo `src/charts.py` (PNGs 300 DPI em `reports/figures/`) e construção/execução do notebook executivo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-02-PLAN.md — Redação e exportação do Memo Executivo de 1 página (`reports/memo_orbitshop.md` e `.pdf` <= 400 palavras), `README.md` executivo e validação `make all`
 
 ## Progress
 
