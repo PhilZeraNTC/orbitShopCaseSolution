@@ -13,7 +13,7 @@ Este roadmap estrutura a construção do repositório auditável de Due Diligenc
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core & Testes** - Fundação do ambiente (`uv`/`Makefile`), módulos `src/loader.py`, `src/audit.py`, `src/metrics.py` e suíte `pytest` validando o Ground Truth (Q1–Q8) (completed 2026-11-15)
-- [ ] **Phase 2: Notebook & Gráficos** - Gráficos estáticos 300 DPI (`src/charts.py`), notebook executivo executado, Memo Executivo de 1 página (MD/PDF <= 400 palavras) e `README.md`
+- [x] **Phase 2: Notebook & Gráficos** - Gráficos estáticos 300 DPI (`src/charts.py`), notebook executivo executado, Memo Executivo de 1 página (MD/PDF <= 400 palavras) e `README.md` (completed 2026-11-15)
 
 ## Phase Details
 
@@ -49,7 +49,7 @@ Plans:
   2. O comando `make reproduce` executa os testes e roda o notebook executivo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`) via `nbconvert --to notebook --execute --inplace` sem erros, salvando tabelas formatadas e gráficos inline.
   3. O Memo Executivo de 1 página existe em `reports/memo_orbitshop.md` e `reports/memo_orbitshop.pdf` respeitando o limite estrito de no máximo 400 palavras.
   4. `README.md` apresenta guia de execução em 1 comando, resumo executivo, tabela de rastreabilidade Q1–Q9 e gráficos embutidos, com `make all` concluindo ponta a ponta com sucesso.
-**Plans**: 2/2 plans executed
+**Plans**: 2/2 plans complete
 
 Plans:
 **Wave 1**
@@ -66,4 +66,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core & Testes | 3/3 | Complete    | 2026-11-15 |
-| 2. Notebook & Gráficos | 2/2 | In Progress | - |
+| 2. Notebook & Gráficos | 2/2 | Complete    | 2026-11-15 |
