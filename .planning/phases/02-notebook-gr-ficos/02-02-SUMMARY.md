@@ -58,7 +58,7 @@ completed: 2026-11-15
 Each task was committed atomically:
 
 1. **Task 1: Author 1-page Executive Memo in reports/memo_orbitshop.md (<= 400 words) and generate reports/memo_orbitshop.pdf** - `7ef1625` (feat)
-2. **Task 2: Write executive README.md, add deliverable tests to tests/test_metrics.py, and verify make all** - `220ff65` (feat)
+2. **Task 2: Write executive README.md, add deliverable tests to tests/test_metrics.py, and verify make all** - `5d2e5f4` (feat)
 
 ## Files Created/Modified
 - `reports/memo_orbitshop.md` - Memo Executivo de 1 página em Markdown (399 palavras) para o Comitê Series C
@@ -83,3 +83,4 @@ None - plan executed exactly as written.
 ---
 *Phase: 02-notebook-gr-ficos*
 *Completed: 2026-11-15*
+
