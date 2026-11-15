@@ -45,8 +45,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Executive Notebook & Reports (EXEC)
 
 - [x] **EXEC-01**: Notebook executivo limpo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`) importa funções de `src/`, exibe tabelas formatadas e gráficos inline, e executa sem erros via `nbconvert --to notebook --execute --inplace`
-- [ ] **EXEC-02**: Memo Executivo de 1 página gerado em `reports/memo_orbitshop.md` e `reports/memo_orbitshop.pdf` contendo no máximo 400 palavras e respondendo com precisão executiva ao comitê de Due Diligence Series C
-- [ ] **EXEC-03**: `README.md` executivo documenta guia de execução em 1 comando, resumo executivo, tabela de rastreabilidade Q1–Q9 e gráficos de `reports/figures/` embutidos
+- [x] **EXEC-02**: Memo Executivo de 1 página gerado em `reports/memo_orbitshop.md` e `reports/memo_orbitshop.pdf` contendo no máximo 400 palavras e respondendo com precisão executiva ao comitê de Due Diligence Series C
+- [x] **EXEC-03**: `README.md` executivo documenta guia de execução em 1 comando, resumo executivo, tabela de rastreabilidade Q1–Q9 e gráficos de `reports/figures/` embutidos
 
 ## v2 Requirements
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-01 | Phase 1 | Complete |
 | CHRT-01 | Phase 2 | Complete |
 | EXEC-01 | Phase 2 | Complete |
-| EXEC-02 | Phase 2 | Pending |
-| EXEC-03 | Phase 2 | Pending |
+| EXEC-02 | Phase 2 | Complete |
+| EXEC-03 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 20 total
