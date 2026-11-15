@@ -40,11 +40,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Static Visualizations (CHRT)
 
-- [ ] **CHRT-01**: `src/charts.py` gera gráficos estáticos PNG em alta resolução (300 DPI) em `reports/figures/` cobrindo: (1) status de pedidos e funil de conversão Q2, (2) reconciliação financeira e ticket B2B vs. B2C Q6, (3) taxa de cancelamento por canal de aquisição Q4, (4) série mensal de pedidos 2023–2024 Q5 e (5) avaliação média vs. taxa de tickets por fornecedor Q7
+- [x] **CHRT-01**: `src/charts.py` gera gráficos estáticos PNG em alta resolução (300 DPI) em `reports/figures/` cobrindo: (1) status de pedidos e funil de conversão Q2, (2) reconciliação financeira e ticket B2B vs. B2C Q6, (3) taxa de cancelamento por canal de aquisição Q4, (4) série mensal de pedidos 2023–2024 Q5 e (5) avaliação média vs. taxa de tickets por fornecedor Q7
 
 ### Executive Notebook & Reports (EXEC)
 
-- [ ] **EXEC-01**: Notebook executivo limpo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`) importa funções de `src/`, exibe tabelas formatadas e gráficos inline, e executa sem erros via `nbconvert --to notebook --execute --inplace`
+- [x] **EXEC-01**: Notebook executivo limpo (`notebooks/02_analise_executiva.ipynb` e `notebooks/analise_orbitshop.ipynb`) importa funções de `src/`, exibe tabelas formatadas e gráficos inline, e executa sem erros via `nbconvert --to notebook --execute --inplace`
 - [ ] **EXEC-02**: Memo Executivo de 1 página gerado em `reports/memo_orbitshop.md` e `reports/memo_orbitshop.pdf` contendo no máximo 400 palavras e respondendo com precisão executiva ao comitê de Due Diligence Series C
 - [ ] **EXEC-03**: `README.md` executivo documenta guia de execução em 1 comando, resumo executivo, tabela de rastreabilidade Q1–Q9 e gráficos de `reports/figures/` embutidos
 
@@ -89,8 +89,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | METR-05 | Phase 1 | Complete |
 | METR-06 | Phase 1 | Complete |
 | TEST-01 | Phase 1 | Complete |
-| CHRT-01 | Phase 2 | Pending |
-| EXEC-01 | Phase 2 | Pending |
+| CHRT-01 | Phase 2 | Complete |
+| EXEC-01 | Phase 2 | Complete |
 | EXEC-02 | Phase 2 | Pending |
 | EXEC-03 | Phase 2 | Pending |
 
