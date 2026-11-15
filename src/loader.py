@@ -1,4 +1,4 @@
-"""Data loading and schema typing for OrbitShop Due Diligence Series C."""
+"""Data loading, schema typing, and relational integrity auditing for OrbitShop."""
 
 from __future__ import annotations
 
@@ -63,3 +63,59 @@ def load_orbitshop_data(path: Path | str | None = None) -> dict[str, pd.DataFram
 
     return data
 
+
+def audit_primary_keys(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Audit row/column counts, exact duplicates, duplicate IDs, and null IDs across all 6 tables."""
+    rows: list[dict[str, int | str]] = []
+    for table_name in EXPECTED_ROW_COUNTS:
+        df = data[table_name]
+        rows.append(
+            {
+                "tabela": table_name,
+                "linhas": int(len(df)),
+                "colunas": int(df.shape[1]),
+                "duplicatas_exatas": int(df.duplicated().sum()),
+                "ids_duplicados": int(df["id"].duplicated().sum()),
+                "ids_nulos": int(df["id"].isna().sum()),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def audit_relational_integrity(data: dict[str, pd.DataFrame]) -> dict[str, int]:
+    """Audit referential (FK) and temporal integrity across all 6 transactional tables."""
+    clientes = data["Clientes"]
+    produtos = data["Produtos"]
+    pedidos = data["Pedidos"]
+    itens = data["Itens_Pedido"]
+    tickets = data["Tickets_Suporte"]
+    avaliacoes = data["Avaliacoes"]
+
+    ped_cli = pedidos.merge(
+        clientes[["id", "data_cadastro"]],
+        left_on="cliente_id",
+        right_on="id",
+        how="left",
+        suffixes=("", "_cli"),
+    )
+
+    return {
+        "pedidos_sem_cliente_valido": int((~pedidos["cliente_id"].isin(clientes["id"])).sum()),
+        "itens_sem_pedido_valido": int((~itens["pedido_id"].isin(pedidos["id"])).sum()),
+        "itens_sem_produto_valido": int((~itens["produto_id"].isin(produtos["id"])).sum()),
+        "pedidos_sem_nenhum_item": int((~pedidos["id"].isin(itens["pedido_id"])).sum()),
+        "tickets_sem_pedido_valido": int((~tickets["pedido_id"].isin(pedidos["id"])).sum()),
+        "avaliacoes_sem_pedido_valido": int((~avaliacoes["pedido_id"].isin(pedidos["id"])).sum()),
+        "pedidos_antes_cadastro_cliente": int(
+            (ped_cli["data_pedido"] < ped_cli["data_cadastro"]).sum()
+        ),
+        "tickets_resolucao_antes_abertura": int(
+            (tickets["data_resolucao"] < tickets["data_abertura"]).sum()
+        ),
+        "tickets_resolvido_sem_data_resolucao": int(
+            ((tickets["status"] == "resolvido") & (tickets["data_resolucao"].isna())).sum()
+        ),
+        "tickets_aberto_com_data_resolucao": int(
+            ((tickets["status"] != "resolvido") & (tickets["data_resolucao"].notna())).sum()
+        ),
+    }
