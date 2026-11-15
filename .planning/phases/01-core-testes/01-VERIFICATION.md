@@ -19,7 +19,7 @@ covered_files:
   - "src/metrics.py"
   - "tests/__init__.py"
   - "tests/test_metrics.py"
-covered_digest: "v4:sha256:2a751273d708f602836b1a6cefc39d9ca83c1d576b433b3bdb655f3c75d65208"
+covered_digest: "v4:sha256:3795d281f5142166e60b0b4c1eb4b1afb46353e5e54d890e781971a4f2869825"
 behavior_unverified: 0
 overrides_applied: 0
 ---
@@ -83,3 +83,4 @@ overrides_applied: 0
   - `data/Base_Dados_OrbitShop.xlsx` e `notebooks/01_eda_auditoria_exploratoria.ipynb` intactos (`VERIFIED`).
   - `Pedidos.valor_total` utilizado como fonte oficial de receita/ticket para Q2, Q4 e Q8 (`VERIFIED`).
   - Sem mocks de dados em `tests/test_metrics.py` (`VERIFIED`).
+

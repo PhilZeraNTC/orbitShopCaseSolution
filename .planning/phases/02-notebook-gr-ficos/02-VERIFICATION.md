@@ -16,7 +16,7 @@ covered_files:
   - "reports/memo_orbitshop.pdf"
   - "src/charts.py"
   - "tests/test_metrics.py"
-covered_digest: "v4:sha256:0ef6abbf72d51940cdddbb8a7657767ec5cd9b32f9f5ba66a35feb741539a709"
+covered_digest: "v4:sha256:738784914ed2cbea7f7bf5fe8102848ce2446739989f0ba1b604c484bc35818d"
 ---
 
 # Phase 02: Notebook & Gráficos — Verification Report
@@ -83,3 +83,4 @@ None. Zero lint errors (`uv run ruff check src tests` -> `All checks passed!`) a
 ### Human Verification Required
 
 None — all requirements, figures, notebook cell outputs, and word-count constraints are deterministically verified.
+
