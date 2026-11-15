@@ -164,6 +164,7 @@ def metrics_q3_categories(itens_full: pd.DataFrame, pedidos: pd.DataFrame) -> pd
         )
         .merge(receita_nao_cancelada, on="categoria", how="left")
     )
+    q3_df["receita_nao_cancelada"] = q3_df["receita_nao_cancelada"].fillna(0.0)
 
     q3_df["ticket_liquido_por_unidade"] = (
         q3_df["receita_liquida"] / q3_df["unidades_vendidas"]
