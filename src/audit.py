@@ -127,6 +127,13 @@ def reconcile_orders_vs_items(
     )
 
     rec = pedidos.merge(agg_itens, left_on="id", right_on="pedido_id", how="left").copy()
+    rec["qtd_itens"] = rec["qtd_itens"].fillna(0).astype(int)
+    rec["unidades"] = rec["unidades"].fillna(0).astype(int)
+    for col in ("soma_bruta_itens", "soma_liquida_itens", "custo_pedido", "lucro_pedido"):
+        rec[col] = rec[col].fillna(0.0)
+    rec["tem_desc_nulo"] = rec["tem_desc_nulo"].where(rec["tem_desc_nulo"].notna(), False).astype(
+        bool
+    )
     rec["diff_liquida"] = rec["valor_total"] - rec["soma_liquida_itens"]
     rec["diff_bruta"] = rec["valor_total"] - rec["soma_bruta_itens"]
 
