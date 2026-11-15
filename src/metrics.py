@@ -333,6 +333,8 @@ def metrics_q7_suppliers(
         vendas_forn.merge(aval_forn, on="fornecedor", how="left")
         .merge(tkt_forn_agg, on="fornecedor", how="left")
     )
+    for int_col in ("qtd_avaliacoes", "tickets_associados", "tickets_defeito_troca"):
+        q7_forn[int_col] = q7_forn[int_col].fillna(0).astype(int)
     q7_forn["tickets_por_100_itens"] = (
         q7_forn["tickets_associados"] / q7_forn["itens_vendidos"] * 100.0
     )
