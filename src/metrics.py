@@ -224,6 +224,202 @@ def metrics_q4_channels(
     return q4_df, summary
 
 
+def metrics_q5_monthly(
+    df_pedidos: pd.DataFrame,
+) -> tuple[pd.DataFrame, dict[str, int | float | str]]:
+    """Compute Q5 monthly order evolution (2023-2024) and the Nov/2023 Black Friday spike."""
+    q5_df = (
+        df_pedidos.groupby("ano_mes", as_index=False)
+        .agg(
+            total_pedidos=("id", "count"),
+            cancelados=("is_cancelado", "sum"),
+            taxa_cancel_pct=("is_cancelado", lambda s: float(s.mean() * 100)),
+            pct_com_cupom=("cupom_desconto", lambda s: float((s == "sim").mean() * 100)),
+            receita_pedidos=("valor_total", "sum"),
+            receita_pedidos_imputada=("valor_total_imputado", "sum"),
+            receita_liquida=("soma_liquida_itens", "sum"),
+            ped_site=("canal_venda", lambda s: int((s == "site").sum())),
+            ped_app=("canal_venda", lambda s: int((s == "app").sum())),
+            ped_mkt=("canal_venda", lambda s: int((s == "marketplace").sum())),
+        )
+        .sort_values("ano_mes")
+        .reset_index(drop=True)
+    )
+
+    nov23_row = q5_df.loc[q5_df["ano_mes"] == "2023-11"].iloc[0]
+    nov24_row = q5_df.loc[q5_df["ano_mes"] == "2024-11"].iloc[0]
+    media_ex_nov23 = float(
+        q5_df.loc[q5_df["ano_mes"] != "2023-11", "total_pedidos"].mean()
+    )
+    pedidos_nov23 = int(nov23_row["total_pedidos"])
+
+    summary: dict[str, int | float | str] = {
+        "pico_ano_mes": "2023-11",
+        "pedidos_nov_2023": pedidos_nov23,
+        "ped_site_nov_2023": int(nov23_row["ped_site"]),
+        "ped_app_nov_2023": int(nov23_row["ped_app"]),
+        "ped_mkt_nov_2023": int(nov23_row["ped_mkt"]),
+        "pedidos_nov_2024": int(nov24_row["total_pedidos"]),
+        "media_pedidos_ex_nov2023": media_ex_nov23,
+        "multiplo_pico_vs_media": float(pedidos_nov23 / media_ex_nov23),
+    }
+    return q5_df, summary
+
+
+def metrics_q7_suppliers(
+    data: dict[str, pd.DataFrame],
+    itens_full: pd.DataFrame | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
+    """Compute Q7 supplier quality ratings, support ticket incidence, and Nov-Dec 2023 surge."""
+    if itens_full is None:
+        itens_full = enrich_items(data["Itens_Pedido"], data["Produtos"])
+
+    produtos = data["Produtos"]
+    pedidos = data["Pedidos"]
+    avaliacoes = data["Avaliacoes"]
+    tickets = data["Tickets_Suporte"].copy()
+
+    aval_prod = avaliacoes.merge(
+        produtos[["id", "fornecedor", "categoria"]],
+        left_on="produto_id",
+        right_on="id",
+        how="left",
+        suffixes=("", "_prod"),
+    )
+    aval_forn = (
+        aval_prod.groupby("fornecedor", as_index=False)
+        .agg(
+            qtd_avaliacoes=("id", "count"),
+            nota_media=("nota", "mean"),
+            pct_notas_baixas_1_2=("nota", lambda s: float((s <= 2).mean() * 100)),
+        )
+    )
+
+    itens_ped = itens_full.merge(
+        pedidos[["id", "status", "data_pedido"]],
+        left_on="pedido_id",
+        right_on="id",
+        how="left",
+        suffixes=("", "_ped"),
+    )
+    vendas_forn = (
+        itens_ped.groupby("fornecedor", as_index=False)
+        .agg(
+            itens_vendidos=("id", "count"),
+            unidades=("quantidade", "sum"),
+            receita_liquida=("subtotal_liquido", "sum"),
+            taxa_itens_cancelados_pct=(
+                "status",
+                lambda s: float((s == "cancelado").mean() * 100),
+            ),
+        )
+    )
+
+    ped_forn_unique = itens_full[["pedido_id", "fornecedor"]].drop_duplicates()
+    tickets_forn = tickets.merge(ped_forn_unique, on="pedido_id", how="inner")
+    tkt_forn_agg = (
+        tickets_forn.groupby("fornecedor", as_index=False)
+        .agg(
+            tickets_associados=("id", "count"),
+            tickets_defeito_troca=(
+                "categoria_problema",
+                lambda s: int(s.isin(["produto_com_defeito", "troca"]).sum()),
+            ),
+        )
+    )
+
+    q7_forn = (
+        vendas_forn.merge(aval_forn, on="fornecedor", how="left")
+        .merge(tkt_forn_agg, on="fornecedor", how="left")
+    )
+    q7_forn["tickets_por_100_itens"] = (
+        q7_forn["tickets_associados"] / q7_forn["itens_vendidos"] * 100.0
+    )
+    q7_forn = q7_forn.sort_values("nota_media", ascending=True).reset_index(drop=True)
+
+    tickets["ano_mes"] = tickets["data_abertura"].dt.to_period("M").astype(str)
+    tickets_mensal = tickets.pivot_table(
+        index="ano_mes",
+        columns="categoria_problema",
+        values="id",
+        aggfunc="count",
+        fill_value=0,
+    )
+    tickets_mensal["TOTAL"] = tickets_mensal.sum(axis=1)
+
+    tickets_forn["ano_mes"] = tickets_forn["data_abertura"].dt.to_period("M").astype(str)
+    tickets_forn_mensal = tickets_forn.pivot_table(
+        index="ano_mes",
+        columns="fornecedor",
+        values="id",
+        aggfunc="count",
+        fill_value=0,
+    )
+
+    delta_row = q7_forn.loc[q7_forn["fornecedor"] == "DeltaFornece ME"].iloc[0]
+    peers_df = q7_forn.loc[q7_forn["fornecedor"] != "DeltaFornece ME"]
+
+    summary: dict[str, Any] = {
+        "outlier_fornecedor": "DeltaFornece ME",
+        "delta_nota_media": float(delta_row["nota_media"]),
+        "delta_pct_notas_1_2": float(delta_row["pct_notas_baixas_1_2"]),
+        "delta_tickets_por_100_itens": float(delta_row["tickets_por_100_itens"]),
+        "peers_min_nota_media": float(peers_df["nota_media"].min()),
+        "peers_max_nota_media": float(peers_df["nota_media"].max()),
+        "peers_min_tickets_por_100_itens": float(
+            peers_df["tickets_por_100_itens"].min()
+        ),
+        "peers_max_tickets_por_100_itens": float(
+            peers_df["tickets_por_100_itens"].max()
+        ),
+        "tickets_nov_2023": int(tickets_mensal.loc["2023-11", "TOTAL"]),
+        "tickets_dez_2023": int(tickets_mensal.loc["2023-12", "TOTAL"]),
+        "tickets_forn_mensal_df": tickets_forn_mensal,
+    }
+    return q7_forn, tickets_mensal, summary
+
+
+def metrics_q8_recommendation(df_pedidos: pd.DataFrame) -> dict[str, float | int]:
+    """Compute Q8 financial sizing for restructuring paid_search cancellation rate."""
+    ps_mask = df_pedidos["canal_aquisicao"] == "paid_search"
+    other_mask = ~ps_mask
+
+    pedidos_ps = int(ps_mask.sum())
+    cancelados_ps = int(df_pedidos.loc[ps_mask, "is_cancelado"].sum())
+    taxa_ps_pct = float(cancelados_ps / pedidos_ps * 100.0)
+
+    pedidos_outros = int(other_mask.sum())
+    cancelados_outros = int(df_pedidos.loc[other_mask, "is_cancelado"].sum())
+    taxa_outros_exata_pct = float(cancelados_outros / pedidos_outros * 100.0)
+    taxa_benchmark_prd_pct = 11.9
+
+    ticket_medio_ps = float(df_pedidos.loc[ps_mask, "valor_total"].mean())
+    ticket_medio_ps_imputado = float(
+        df_pedidos.loc[ps_mask, "valor_total_imputado"].mean()
+    )
+
+    pedidos_recuperados = float(
+        pedidos_ps * (cancelados_ps / pedidos_ps - taxa_benchmark_prd_pct / 100.0)
+    )
+    pedidos_recuperados_exato = float(
+        pedidos_ps * (cancelados_ps / pedidos_ps - cancelados_outros / pedidos_outros)
+    )
+    receita_bruta_recuperavel = float(pedidos_recuperados * ticket_medio_ps)
+
+    return {
+        "pedidos_paid_search": pedidos_ps,
+        "cancelados_paid_search": cancelados_ps,
+        "taxa_paid_search_pct": taxa_ps_pct,
+        "taxa_benchmark_outros_canais_pct": taxa_outros_exata_pct,
+        "taxa_benchmark_prd_pct": taxa_benchmark_prd_pct,
+        "pedidos_recuperados": pedidos_recuperados,
+        "pedidos_recuperados_exato": pedidos_recuperados_exato,
+        "ticket_medio_paid_search": ticket_medio_ps,
+        "ticket_medio_paid_search_imputado": ticket_medio_ps_imputado,
+        "receita_bruta_recuperavel": receita_bruta_recuperavel,
+    }
+
+
 __all__ = [
     "build_orders_analytical_df",
     "enrich_items",
@@ -231,4 +427,7 @@ __all__ = [
     "metrics_q2_status",
     "metrics_q3_categories",
     "metrics_q4_channels",
+    "metrics_q5_monthly",
+    "metrics_q7_suppliers",
+    "metrics_q8_recommendation",
 ]
