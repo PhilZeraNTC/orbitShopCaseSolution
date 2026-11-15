@@ -198,8 +198,9 @@ def test_q3_categories(
         "Beleza & Saúde",
         "Esporte & Lazer",
         "Moda",
-        "Livros",
-        "Brinquedos",
+        "Livros & Papelaria",
+        "Bebês & Crianças",
+        "Alimentos & Bebidas",
     ]
     assert q3_df.loc[0, "receita_liquida"] == pytest.approx(30801235.39, abs=0.01)
     assert q3_df.loc[1, "receita_liquida"] == pytest.approx(24516724.17, abs=0.01)
