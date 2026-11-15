@@ -9,14 +9,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Environment & Data Foundation (ENV)
 
-- [ ] **ENV-01**: Repositório configurado com `uv` (`pyproject.toml` + `uv.lock`) e `requirements.txt` espelhado contendo apenas as dependências enxutas (`pandas`, `openpyxl`, `numpy`, `scipy`, `matplotlib`, `seaborn`, `jupyter`, `nbconvert`, `pytest`, `ruff`)
-- [ ] **ENV-02**: Base bruta disponível em `data/Base_Dados_OrbitShop.xlsx` intacta (100% idêntica em checksum ao arquivo original) e notebook histórico `notebooks/01_eda_auditoria_exploratoria.ipynb` preservado
-- [ ] **ENV-03**: `Makefile` com alvos funcionais `setup`, `test`, `reproduce` (testes + execução inplace do notebook via `nbconvert`) e `all`
+- [x] **ENV-01**: Repositório configurado com `uv` (`pyproject.toml` + `uv.lock`) e `requirements.txt` espelhado contendo apenas as dependências enxutas (`pandas`, `openpyxl`, `numpy`, `scipy`, `matplotlib`, `seaborn`, `jupyter`, `nbconvert`, `pytest`, `ruff`)
+- [x] **ENV-02**: Base bruta disponível em `data/Base_Dados_OrbitShop.xlsx` intacta (100% idêntica em checksum ao arquivo original) e notebook histórico `notebooks/01_eda_auditoria_exploratoria.ipynb` preservado
+- [x] **ENV-03**: `Makefile` com alvos funcionais `setup`, `test`, `reproduce` (testes + execução inplace do notebook via `nbconvert`) e `all`
 
 ### Data Loading & Relational Integrity (LOAD)
 
-- [ ] **LOAD-01**: `src/loader.py` carrega de forma tipada as 6 abas de `data/Base_Dados_OrbitShop.xlsx` (`Clientes`: 3.000 linhas, `Produtos`: 200 linhas, `Pedidos`: 15.000 linhas, `Itens_Pedido`: 36.740 linhas, `Tickets_Suporte`: 4.000 linhas, `Avaliacoes`: 8.000 linhas)
-- [ ] **LOAD-02**: `src/loader.py` audita integridade relacional e temporal comprovando zero chaves primárias duplicadas e zero chaves estrangeiras órfãs entre as 6 tabelas
+- [x] **LOAD-01**: `src/loader.py` carrega de forma tipada as 6 abas de `data/Base_Dados_OrbitShop.xlsx` (`Clientes`: 3.000 linhas, `Produtos`: 200 linhas, `Pedidos`: 15.000 linhas, `Itens_Pedido`: 36.740 linhas, `Tickets_Suporte`: 4.000 linhas, `Avaliacoes`: 8.000 linhas)
+- [x] **LOAD-02**: `src/loader.py` audita integridade relacional e temporal comprovando zero chaves primárias duplicadas e zero chaves estrangeiras órfãs entre as 6 tabelas
 
 ### Data Audit & Financial Reconciliation (AUDT)
 
@@ -73,11 +73,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENV-01 | Phase 1 | Pending |
-| ENV-02 | Phase 1 | Pending |
-| ENV-03 | Phase 1 | Pending |
-| LOAD-01 | Phase 1 | Pending |
-| LOAD-02 | Phase 1 | Pending |
+| ENV-01 | Phase 1 | Complete |
+| ENV-02 | Phase 1 | Complete |
+| ENV-03 | Phase 1 | Complete |
+| LOAD-01 | Phase 1 | Complete |
+| LOAD-02 | Phase 1 | Complete |
 | AUDT-01 | Phase 1 | Pending |
 | AUDT-02 | Phase 1 | Pending |
 | AUDT-03 | Phase 1 | Pending |
