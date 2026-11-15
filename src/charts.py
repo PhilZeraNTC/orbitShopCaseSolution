@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -490,20 +492,128 @@ def plot_q7_suppliers(
     return out_path
 
 
+def render_memo_pdf(
+    md_path: Path = PROJECT_ROOT / "reports" / "memo_orbitshop.md",
+    pdf_path: Path = PROJECT_ROOT / "reports" / "memo_orbitshop.pdf",
+) -> Path:
+    """Render the 1-page Executive Memo Markdown into a clean 1-page A4 PDF."""
+    if not md_path.exists():
+        raise FileNotFoundError(f"Memo Markdown não encontrado em: {md_path}")
+
+    raw_text = md_path.read_text(encoding="utf-8")
+    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig = plt.figure(figsize=(8.27, 11.69))
+    ax = fig.add_axes([0.06, 0.04, 0.88, 0.92])
+    ax.axis("off")
+
+    # Top executive banner bar
+    ax.plot([0.0, 1.0], [0.965, 0.965], color=NAVY, linewidth=2.5, transform=ax.transAxes)
+
+    y = 0.985
+    for raw_line in raw_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            y -= 0.010
+            continue
+        if line.startswith("---"):
+            ax.plot(
+                [0.0, 1.0], [y, y], color="#CBD5E1", linewidth=0.8, transform=ax.transAxes
+            )
+            y -= 0.014
+            continue
+
+        # Clean markdown syntax for PDF typography
+        clean = re.sub(r"\*\*(.*?)\*\*", r"\1", line)
+        clean = re.sub(r"`(.*?)`", r"\1", clean)
+        clean = clean.replace(
+            r"$\chi^2 = 734,42, p < 10^{-158}$",
+            "chi2 = 734,42, p < 10^-158",
+        )
+
+        if clean.startswith("# "):
+            title_txt = clean[2:].strip()
+            ax.text(
+                0.0,
+                y,
+                title_txt,
+                fontsize=12.5,
+                fontweight="bold",
+                color=NAVY,
+                va="top",
+                transform=ax.transAxes,
+            )
+            y -= 0.032
+        elif clean.startswith("### "):
+            sec_txt = clean[4:].strip()
+            y -= 0.006
+            ax.text(
+                0.0,
+                y,
+                sec_txt,
+                fontsize=10.2,
+                fontweight="bold",
+                color=NAVY,
+                va="top",
+                transform=ax.transAxes,
+            )
+            y -= 0.022
+        elif any(clean.startswith(p) for p in ("Para:", "De:", "Data:", "Assunto:")):
+            ax.text(
+                0.0,
+                y,
+                clean,
+                fontsize=8.8,
+                fontweight="bold",
+                color="#334155",
+                va="top",
+                transform=ax.transAxes,
+            )
+            y -= 0.017
+        else:
+            is_bullet = clean.startswith("- ")
+            width = 96 if not is_bullet else 92
+            wrapped = textwrap.wrap(
+                clean,
+                width=width,
+                subsequent_indent="   " if is_bullet else "",
+            )
+            for wline in wrapped:
+                ax.text(
+                    0.0,
+                    y,
+                    wline,
+                    fontsize=8.6,
+                    color="#1E293B",
+                    va="top",
+                    transform=ax.transAxes,
+                )
+                y -= 0.0155
+            y -= 0.004
+
+    fig.savefig(pdf_path, format="pdf")
+    plt.close(fig)
+    return pdf_path
+
+
 def generate_all_charts(output_dir: Path = FIGURES_DIR) -> dict[str, Path]:
-    """Load data and generate all 5 executive 300 DPI PNG charts."""
+    """Load data and generate all 5 executive 300 DPI PNG charts plus the 1-page PDF memo."""
     data = load_orbitshop_data()
     itens_full = enrich_items(data["Itens_Pedido"], data["Produtos"])
     rec, _ = reconcile_orders_vs_items(data["Pedidos"], itens_full, data["Clientes"])
     df_pedidos = build_orders_analytical_df(data)
 
-    return {
+    results: dict[str, Path] = {
         "q2_status": plot_q2_status(df_pedidos, output_dir),
         "q6_reconciliation": plot_q6_reconciliation(rec, data["Clientes"], output_dir),
         "q4_channels": plot_q4_channels(df_pedidos, output_dir),
         "q5_monthly": plot_q5_monthly(df_pedidos, output_dir),
         "q7_suppliers": plot_q7_suppliers(data, itens_full, output_dir),
     }
+    memo_md = PROJECT_ROOT / "reports" / "memo_orbitshop.md"
+    if memo_md.exists():
+        results["memo_pdf"] = render_memo_pdf(memo_md)
+    return results
 
 
 if __name__ == "__main__":
