@@ -22,6 +22,15 @@ from src.loader import (
     audit_relational_integrity,
     load_orbitshop_data,
 )
+from src.metrics import (
+    metrics_camila_vs_rogerio,
+    metrics_q2_status,
+    metrics_q3_categories,
+    metrics_q4_channels,
+    metrics_q5_monthly,
+    metrics_q7_suppliers,
+    metrics_q8_recommendation,
+)
 
 
 @pytest.fixture(scope="session")
@@ -146,3 +155,125 @@ def test_q6_financial_reconciliation(
     assert seg["b2c_media_valor_total"] == pytest.approx(1264.72, abs=0.01)
     assert seg["ratio_b2b_b2c"] == pytest.approx(6.15, abs=0.01)
     assert seg["ratio_b2b_b2c_imputado"] == pytest.approx(6.15, abs=0.01)
+
+
+def test_paradox_and_q2_status(df_pedidos: pd.DataFrame) -> None:
+    """Verify PRD Section 3.3 Camila vs. Rogerio cancellation paradox and Q2 order status."""
+    cr = metrics_camila_vs_rogerio(df_pedidos)
+    assert cr["total_pedidos"] == 15000
+    assert cr["cancelados_global"] == 2537
+    assert cr["taxa_cancel_global_pct"] == pytest.approx(16.91, abs=0.01)
+    assert cr["pedidos_2023"] == 8386
+    assert cr["cancelados_2023"] == 1407
+    assert cr["taxa_cancel_2023_pct"] == pytest.approx(16.78, abs=0.01)
+    assert cr["pedidos_2024"] == 6614
+    assert cr["cancelados_2024"] == 1130
+    assert cr["taxa_cancel_2024_pct"] == pytest.approx(17.08, abs=0.01)
+
+    _, q2 = metrics_q2_status(df_pedidos)
+    assert q2["entregue_qtd"] == 9959
+    assert q2["entregue_pct"] == pytest.approx(66.39, abs=0.01)
+    assert q2["cancelado_qtd"] == 2537
+    assert q2["cancelado_pct"] == pytest.approx(16.91, abs=0.01)
+    assert q2["em_transito_qtd"] == 1371
+    assert q2["em_transito_pct"] == pytest.approx(9.14, abs=0.01)
+    assert q2["em_transito_2023"] == 788
+    assert q2["devolvido_qtd"] == 1133
+    assert q2["devolvido_pct"] == pytest.approx(7.55, abs=0.01)
+    assert q2["nao_convertidos_qtd"] == 3670
+    assert q2["nao_convertidos_pct"] == pytest.approx(24.47, abs=0.01)
+    assert q2["receita_nao_convertida"] == pytest.approx(9467259.31, abs=0.01)
+
+
+def test_q3_categories(
+    raw_data: dict[str, pd.DataFrame], itens_full: pd.DataFrame
+) -> None:
+    """Verify PRD Section 3.4 (Q3) volume vs. relative item revenue category rankings."""
+    q3_df = metrics_q3_categories(itens_full, raw_data["Pedidos"])
+
+    # Revenue rank (already sorted by receita_liquida desc)
+    assert list(q3_df["categoria"]) == [
+        "Eletrônicos",
+        "Casa & Decoração",
+        "Beleza & Saúde",
+        "Esporte & Lazer",
+        "Moda",
+        "Livros",
+        "Brinquedos",
+    ]
+    assert q3_df.loc[0, "receita_liquida"] == pytest.approx(30801235.39, abs=0.01)
+    assert q3_df.loc[1, "receita_liquida"] == pytest.approx(24516724.17, abs=0.01)
+    assert q3_df.loc[2, "receita_liquida"] == pytest.approx(23347196.82, abs=0.01)
+    assert q3_df.loc[3, "receita_liquida"] == pytest.approx(20233855.75, abs=0.01)
+    assert q3_df.loc[4, "receita_liquida"] == pytest.approx(19862985.25, abs=0.01)
+
+    # Volume top 3
+    vol_df = q3_df.sort_values("unidades_vendidas", ascending=False).reset_index(drop=True)
+    assert list(vol_df["categoria"][:3]) == ["Eletrônicos", "Casa & Decoração", "Moda"]
+    assert list(vol_df["unidades_vendidas"][:3]) == [18658, 17899, 15680]
+
+    # Moda has lowest average practiced price (R$ 1,347.98)
+    moda_price = float(
+        q3_df.loc[q3_df["categoria"] == "Moda", "preco_medio_praticado"].iloc[0]
+    )
+    assert moda_price == pytest.approx(1347.98, abs=0.01)
+    assert moda_price == float(q3_df["preco_medio_praticado"].min())
+
+
+def test_q4_acquisition_channels(df_pedidos: pd.DataFrame) -> None:
+    """Verify PRD Section 3.5 (Q4) acquisition channel cancellation rates and chi2 test."""
+    q4_df, q4 = metrics_q4_channels(df_pedidos)
+    assert q4["paid_search_pedidos"] == 3965
+    assert q4["paid_search_cancelados"] == 1219
+    assert q4["paid_search_taxa_cancel_pct"] == pytest.approx(30.74, abs=0.01)
+    assert q4["indicacao_taxa_cancel_pct"] == pytest.approx(12.38, abs=0.01)
+    assert q4["organico_taxa_cancel_pct"] == pytest.approx(11.78, abs=0.01)
+    assert q4["redes_sociais_taxa_cancel_pct"] == pytest.approx(11.67, abs=0.01)
+    assert q4["chi2"] == pytest.approx(734.42, abs=0.01)
+    assert q4["p_value"] < 1e-150
+    assert q4["paid_search_ticket_medio"] == pytest.approx(2553.51, abs=0.01)
+    assert float(q4_df["ticket_medio_pedidos"].min()) == pytest.approx(2521.15, abs=0.01)
+    assert float(q4_df["ticket_medio_pedidos"].max()) == pytest.approx(2657.17, abs=0.01)
+
+
+def test_q5_monthly_evolution(df_pedidos: pd.DataFrame) -> None:
+    """Verify PRD Section 3.6 (Q5) monthly evolution and Nov/2023 Black Friday spike."""
+    q5_df, q5 = metrics_q5_monthly(df_pedidos)
+    assert len(q5_df) == 24
+    assert q5["pico_ano_mes"] == "2023-11"
+    assert q5["pedidos_nov_2023"] == 2317
+    assert q5["ped_site_nov_2023"] == 770
+    assert q5["ped_app_nov_2023"] == 783
+    assert q5["ped_mkt_nov_2023"] == 764
+    assert q5["pedidos_nov_2024"] == 585
+    assert round(float(q5["media_pedidos_ex_nov2023"])) == 551
+    assert q5["multiplo_pico_vs_media"] == pytest.approx(4.20, abs=0.02)
+
+
+def test_q7_suppliers_and_support(
+    raw_data: dict[str, pd.DataFrame], itens_full: pd.DataFrame
+) -> None:
+    """Verify PRD Section 3.7 (Q7) DeltaFornece ME quality outlier and Nov-Dec 2023 tickets."""
+    q7_forn, _, q7 = metrics_q7_suppliers(raw_data, itens_full)
+    assert len(q7_forn) == 9
+    assert q7["outlier_fornecedor"] == "DeltaFornece ME"
+    assert q7["delta_nota_media"] == pytest.approx(2.30, abs=0.01)
+    assert q7["delta_pct_notas_1_2"] == pytest.approx(59.90, abs=0.01)
+    assert q7["delta_tickets_por_100_itens"] == pytest.approx(22.94, abs=0.01)
+    assert q7["peers_min_nota_media"] == pytest.approx(3.62, abs=0.01)
+    assert q7["peers_max_nota_media"] == pytest.approx(3.84, abs=0.01)
+    assert q7["peers_min_tickets_por_100_itens"] == pytest.approx(22.16, abs=0.01)
+    assert q7["peers_max_tickets_por_100_itens"] == pytest.approx(24.85, abs=0.01)
+    assert q7["tickets_nov_2023"] == 375
+    assert q7["tickets_dez_2023"] == 391
+
+
+def test_q8_recommendation_sizing(df_pedidos: pd.DataFrame) -> None:
+    """Verify PRD Section 3.8 (Q8) financial sizing of paid_search restructuring."""
+    q8 = metrics_q8_recommendation(df_pedidos)
+    assert q8["pedidos_paid_search"] == 3965
+    assert q8["cancelados_paid_search"] == 1219
+    assert q8["taxa_paid_search_pct"] == pytest.approx(30.74, abs=0.01)
+    assert round(float(q8["pedidos_recuperados"])) == 747
+    assert q8["ticket_medio_paid_search"] == pytest.approx(2553.51, abs=0.01)
+    assert q8["receita_bruta_recuperavel"] / 1e6 == pytest.approx(1.91, abs=0.01)
