@@ -27,14 +27,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `src/loader.py` e `src/audit.py` carregam as 6 abas tipadas sem chaves duplicadas ou órfãs e reproduzem exatamente a auditoria de nulos, anomalias comerciais (21.243 descontos sem cupom, 2.574 itens abaixo do custo) e reconciliação financeira Q6 (`Pedidos.valor_total` R$ 38.418.252,65 vs `Itens_Pedido` R$ 165.878.066,67; ticket B2B = 6,15x B2C após imputação dos 79 nulos).
   3. `src/metrics.py` retorna de forma pura e determinística todos os indicadores validados para o paradoxo Camila vs. Rogério e para as questões Q2, Q3, Q4, Q5, Q7 e Q8.
   4. O comando `make test` executa `pytest` em `tests/test_metrics.py` e aprova 100% dos testes de invariantes numéricos e regras de negócio do Ground Truth.
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 
 Plans:
 **Wave 1**
 - [x] 01-01-PLAN.md — Setup do ambiente (`pyproject.toml`, `uv.lock`, `requirements.txt`, `Makefile`, `data/Base_Dados_OrbitShop.xlsx`) e módulo `src/loader.py`
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-02-PLAN.md — Implementação de `src/audit.py` (nulos, anomalias comerciais e reconciliação Q6) e `src/metrics.py` (paradoxo C-level e Q2–Q8)
+- [x] 01-02-PLAN.md — Implementação de `src/audit.py` (nulos, anomalias comerciais e reconciliação Q6) e `src/metrics.py` (paradoxo C-level e Q2–Q8)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 01-03-PLAN.md — Suíte de testes unitários `tests/test_metrics.py` (`pytest`) validando todos os invariantes do PRD e verificação via `make test`
@@ -62,5 +62,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core & Testes | 1/3 | In Progress | - |
+| 1. Core & Testes | 2/3 | In Progress | - |
 | 2. Notebook & Gráficos | 0/2 | Not started | - |
