@@ -19,7 +19,7 @@ covered_files:
   - "src/metrics.py"
   - "tests/__init__.py"
   - "tests/test_metrics.py"
-covered_digest: v4:sha256:3795d281f5142166e60b0b4c1eb4b1afb46353e5e54d890e781971a4f2869825
+covered_digest: v4:sha256:04e67f684aab3f2392a5e0afaa3ad45a9bec25d4ac756aa465160ce7eed3188e
 behavior_unverified: 0
 overrides_applied: 0
 ---

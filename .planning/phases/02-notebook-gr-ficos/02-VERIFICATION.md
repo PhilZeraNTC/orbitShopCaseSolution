@@ -16,7 +16,7 @@ covered_files:
   - "reports/memo_orbitshop.pdf"
   - "src/charts.py"
   - "tests/test_metrics.py"
-covered_digest: v4:sha256:a346e3d82df5c561348bc1ad11d1285c5e31e8ee47d2c0a613eb528c7852521b
+covered_digest: v4:sha256:fd6c0ed74f253658811c4e302523c8e742b753ad77bfb9285a190d0ed644bcf9
 ---
 
 # Phase 02: Notebook & Gráficos — Verification Report
