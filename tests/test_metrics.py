@@ -284,7 +284,7 @@ def test_q8_recommendation_sizing(df_pedidos: pd.DataFrame) -> None:
 
 
 def test_phase2_deliverables_and_memo_constraints() -> None:
-    """Verify Phase 2 deliverables: 300 DPI PNG figures and executed notebooks."""
+    """Verify Phase 2 deliverables: 300 DPI PNG figures, <= 400-word Memo MD/PDF, and README."""
     figures = [
         "q2_status_pedidos.png",
         "q6_reconciliacao_b2b_b2c.png",
@@ -300,6 +300,17 @@ def test_phase2_deliverables_and_memo_constraints() -> None:
         dpi = Image.open(fpath).info.get("dpi", (0, 0))[0]
         assert round(dpi) == 300
 
+    memo_md = PROJECT_ROOT / "reports" / "memo_orbitshop.md"
+    assert memo_md.exists()
+    memo_text = memo_md.read_text(encoding="utf-8")
+    word_count = len(memo_text.split())
+    assert 200 <= word_count <= 400, f"Memo word count {word_count} exceeds 400-word limit"
+
+    memo_pdf = PROJECT_ROOT / "reports" / "memo_orbitshop.pdf"
+    assert memo_pdf.exists()
+    assert memo_pdf.stat().st_size > 5000
+    assert memo_pdf.read_bytes()[:4] == b"%PDF"
+
     for nb_name in ("02_analise_executiva.ipynb", "analise_orbitshop.ipynb"):
         nb_path = PROJECT_ROOT / "notebooks" / nb_name
         assert nb_path.exists()
@@ -311,4 +322,9 @@ def test_phase2_deliverables_and_memo_constraints() -> None:
             for c in code_cells
         )
 
+    readme_path = PROJECT_ROOT / "README.md"
+    assert readme_path.exists()
+    readme_text = readme_path.read_text(encoding="utf-8")
+    for fname in figures:
+        assert f"reports/figures/{fname}" in readme_text
 
